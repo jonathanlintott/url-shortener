@@ -9,3 +9,6 @@ __pycache__
 
 # Development database
 app.db
+
+# Pytest cache
+.pytest_cache
