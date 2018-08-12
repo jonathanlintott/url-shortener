@@ -12,3 +12,6 @@ app.db
 
 # Pytest cache
 .pytest_cache
+
+# Coverage file
+.coverage
