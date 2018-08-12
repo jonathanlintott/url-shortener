@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # Set config
 app_settings = os.getenv(
-    'APP_SETTINGS', 'application.config.DevelopmentConfig'
+    'APP_SETTINGS', 'application.config.Config'
 )
 app.config.from_object(app_settings)
 
