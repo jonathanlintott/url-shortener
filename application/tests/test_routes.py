@@ -54,6 +54,36 @@ class TestShortenUrl(BaseTestCase):
         self.assertEqual(url_pairs[0].shortened_url, 'abc123')
 
 
+    @mock.patch('application.routes.generate_string')
+    def test_hash_taken(self, gen_mock):
+        gen_mock.side_effect = ['abc123', 'def456']
+
+        # Add first hash to db
+        url_pair = UrlPair(original_url='www.firstplace.com',
+                           shortened_url='abc123')
+        self.db.session.add(url_pair)
+        self.db.session.commit()
+
+        # Make request
+        url = 'www.secondplace.com'
+        response = self.post(self.url, expected_status_code=201,
+                             data={'url': url})
+        out = response.json
+        self.assertIn('shortened_url', out)
+
+        # Assert second hash used
+        self.assertEqual(out['shortened_url'], 'http://localhost/def456')
+
+        self.assertEqual(gen_mock.call_count, 2)
+
+        url_pairs = UrlPair.query.all()
+        self.assertEqual(len(url_pairs), 2)
+        self.assertEqual(url_pairs[0].original_url, 'www.firstplace.com')
+        self.assertEqual(url_pairs[0].shortened_url, 'abc123')
+        self.assertEqual(url_pairs[1].original_url, 'www.secondplace.com')
+        self.assertEqual(url_pairs[1].shortened_url, 'def456')
+
+
 class TestRetrieveURL(BaseTestCase):
     def _setup_data(self):
         self.original_url = 'http://www.anotherplace.org'

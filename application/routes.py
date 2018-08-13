@@ -83,6 +83,9 @@ def shorten_url():
         return jsonify({'error': 'Not a valid URL'}), 400
 
     short_url = generate_string()
+    while UrlPair.query.filter_by(shortened_url=short_url).count():
+        # Hash already in db, generate another
+        short_url = generate_string()
 
     url_pair = UrlPair(original_url=original_url, shortened_url=short_url)
     db.session.add(url_pair)
